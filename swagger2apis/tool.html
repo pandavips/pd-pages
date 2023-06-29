@@ -186,11 +186,12 @@ wantedApi({
           ? "yarn"
           : "npm";
 
-        const preInstallString =
-          packageManager === "npm" ? "npm i" : packageManager + " add";
+        // const preInstallString =
+        //   packageManager === "npm" ? "npm i" : packageManager + " add";
         packageJson.scripts = {
           ...packageJson.scripts,
-          [npmScriptName]: `${preInstallString} && node ./src/api/genApis.mjs && prettier --write ./src/api/*`,
+          //[npmScriptName]: `${preInstallString} && node ./src/api/genApis.mjs && prettier --write ./src/api/*`,
+          [npmScriptName]: `node ./src/api/genApis.mjs && prettier --write ./src/api/*`,
         };
 
         // 添加依赖
