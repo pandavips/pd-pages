@@ -191,7 +191,7 @@ wantedApi({
         packageJson.scripts = {
           ...packageJson.scripts,
           //[npmScriptName]: `${preInstallString} && node ./src/api/genApis.mjs && prettier --write ./src/api/*`,
-          [npmScriptName]: `node ./src/api/genApis.mjs && prettier --write ./src/api/*`,
+          [npmScriptName]: `node ./src/api/genApis.mjs && prettier --write ./src/api/**/*`,
         };
 
         // 添加依赖
