@@ -1,229 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>swagger2apis辅助工具</title>
+    <script src="../lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../lib/utils/index.js"></script>
+    <link rel="stylesheet" href="../lib/bootstrap/css//bootstrap.min.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-    }
+  <body>
+    <div class="container text-center" style="margin-top: 88px">
+      <div class="mb-3">
+        <label for="json-url" class="form-label">远程JSON采集地址</label>
+        <div class="input-group">
+          <input type="text" class="form-control" id="json-url" />
+        </div>
 
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100vw;
-      height: 100vh;
-      background-color: #f3f3f3;
-    }
+        <label for="api-prefix" class="form-label"
+          >要擦除的api路径前缀(可以忽略)</label
+        >
+        <div class="input-group">
+          <input type="text" class="form-control" id="api-prefix" />
+        </div>
 
-    #app {
-      width: 80%;
-      height: 60%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-    }
+        <div class="form-text mt-3">
+          <button type="submit" class="btn btn-primary">
+            ~请选择项目根目录~
+          </button>
+        </div>
+      </div>
+    </div>
 
-    input {
-      width: 100%;
-    }
-
-    button {
-      width: 100%;
-    }
-  </style>
-</head>
-
-<body>
-  <div id="app">
-    <h3>请填写json采集地址:</h3>
-    </h1>
-    <input type="text" />
-
-    <h3>点击按钮,选择项目根目录,自动添加api生成脚本</h1>
-      <button>选择根目录</button>
-  </div>
-
-  <script>
-    // 远程获取npm某个包的版本
-    const getNpmPackageVersion = async (packageName) => {
-      const url = `https://registry.npmjs.org/${packageName}/latest`;
-      const res = await fetch(url);
-      const data = await res.json();
-      return data.version;
-    };
-
-    const genApiTemplate = (url, prefix = '') => `import wantedApi, { getCurrentDirName } from 'swagger2apis'
+    <script>
+      const genApiTemplate = (
+        url,
+        prefix = ""
+      ) => `import wantedApi, { getCurrentDirName } from 'swagger2apis'
 import { join } from 'path'
 wantedApi({
   rawJson: '${url}',
   outDir: join(getCurrentDirName(import.meta.url), './'),
-  apiUrlPrefix: '/boss',
+  apiUrlPrefix: '${prefix}',
   needJS: true
 })\n`;
 
-    const deepDirectoryFind = (() => {
-      const balckList = ["node_modules", ".vscode", ".git", "dist", ".idea"];
+      const deepDirectoryFind = (() => {
+        const balckList = ["node_modules", ".vscode", ".git", "dist", ".idea"];
 
-      return async (
-        fileHandle,
-        callbackFn = () => false,
-        options = {
-          // parent: null,
-          // type: "file",
-          // type: "directory",
-        }
-      ) => {
-        const {
-          type = "directory",
-          depth = Infinity,
-          parent = null,
-        } = options;
-        if (depth <= 0) return;
-        const it = fileHandle.entries();
-        for await (const entry of it) {
-          if (entry[1].kind === "directory") {
-            if (balckList.includes(entry[0])) continue;
-            if (callbackFn(entry, options)) return entry;
-            const entryRes = await deepDirectoryFind(entry[1], callbackFn, {
-              ...options,
-              depth: depth - 1,
-              parent: entry[1],
-            });
-
-            if (entryRes) return entryRes;
-          } else {
-            if (type === "file" && callbackFn(entry, options)) return entry;
+        return async (
+          fileHandle,
+          callbackFn = () => false,
+          options = {
+            // parent: null,
+            // type: "file",
+            // type: "directory",
           }
-        }
-      };
-    })();
+        ) => {
+          const {
+            type = "directory",
+            depth = Infinity,
+            parent = null,
+          } = options;
+          if (depth <= 0) return;
+          const it = fileHandle.entries();
+          for await (const entry of it) {
+            if (entry[1].kind === "directory") {
+              if (balckList.includes(entry[0])) continue;
+              if (callbackFn(entry, options)) return entry;
+              const entryRes = await deepDirectoryFind(entry[1], callbackFn, {
+                ...options,
+                depth: depth - 1,
+                parent: entry[1],
+              });
 
-    const openFile = async () => {
+              if (entryRes) return entryRes;
+            } else {
+              if (type === "file" && callbackFn(entry, options)) return entry;
+            }
+          }
+        };
+      })();
 
-      const jsonUrl = document.querySelector("input").value
-      if (!jsonUrl) return alert("请输入json采集地址")
+      const openFile = async () => {
+        const jsonUrl = document.querySelector("#json-url").value;
+        if (!jsonUrl) return alert("请输入json采集地址");
+        const prefix = document.querySelector("#api-prefix").value || "";
 
-      const fileHandle = await window.showDirectoryPicker({
-        multiple: false,
-        excludeAcceptAllOption: true,
-        types: [
-          {
-            description: "Images",
-            accept: {
-              "image/png": [".png"],
-              "image/jpeg": [".jpg"],
+        const fileHandle = await window.showDirectoryPicker({
+          multiple: false,
+          excludeAcceptAllOption: true,
+          types: [
+            {
+              description: "Images",
+              accept: {
+                "image/png": [".png"],
+                "image/jpeg": [".jpg"],
+              },
             },
-          },
-        ],
-      });
+          ],
+        });
 
-      const apiDirectoryHandle = await deepDirectoryFind(
-        fileHandle,
-        (entry, options = {}) => {
-          const parent = options.parent;
-          if (parent) {
-            return entry[0] === "api" && parent.name === "src";
-          } else {
-            return entry[0] === "api";
+        const apiDirectoryHandle = await deepDirectoryFind(
+          fileHandle,
+          (entry, options = {}) => {
+            const parent = options.parent;
+            if (parent) {
+              return entry[0] === "api" && parent.name === "src";
+            } else {
+              return entry[0] === "api";
+            }
           }
-        }
-      );
-      // 写入生成脚本
-      const newFileHandle = await apiDirectoryHandle[1].getFileHandle(
-        "genApis.mjs",
-        {
-          create: true,
-        }
-      );
-      const writable = await newFileHandle.createWritable();
-      await writable.write(genApiTemplate(jsonUrl, jsonUrl.split('?').at(-1).split('=')));
-      await writable.close();
-
-      // 修改package.json,添加脚本,以及依赖
-      const packageJsonHandle = await fileHandle.getFileHandle(
-        "package.json"
-      );
-      const packageFile = await packageJsonHandle.getFile();
-
-      const readFile = (file) => {
-        return new Promise((r) => {
-          const fs = new FileReader();
-          fs.onload = () => {
-            r(fs.result)
+        );
+        // 写入生成脚本
+        const newFileHandle = await apiDirectoryHandle[1].getFileHandle(
+          "genApis.mjs",
+          {
+            create: true,
           }
-          fs.readAsText(file);
-        })
-      }
+        );
+        const writable = await newFileHandle.createWritable();
+        await writable.write(genApiTemplate(jsonUrl, prefix));
+        await writable.close();
 
-      const packageJson = JSON.parse((await readFile(packageFile)))
+        // 修改package.json,添加脚本,以及依赖
+        const packageJsonHandle = await fileHandle.getFileHandle(
+          "package.json"
+        );
+        const packageFile = await packageJsonHandle.getFile();
 
-      const packageName = "swagger2apis";
-      // 确定版本号
-      let version = "1.1.19";
-      try {
-        version = await getNpmPackageVersion(packageName);
-      } catch {
-        version =
-          prompt(
-            `获取包版本失败,请手动获取最新版本号 https://www.npmjs.com/package/${packageName} ,如果不进行填写,则默认使用${version}版本`
-          ) || version;
-      }
+        const readFile = (file) => {
+          return new Promise((r) => {
+            const fs = new FileReader();
+            fs.onload = () => {
+              r(fs.result);
+            };
+            fs.readAsText(file);
+          });
+        };
 
-      // 添加npm脚本
-      const npmScriptName = 'givemeApi';
-      const packageManager = (await deepDirectoryFind(
-        fileHandle,
-        (entry) => {
-          console.log(entry);
-          return entry[0] === "pnpm-lock.yaml";
-        },
-        {
-          type: "file",
-          depth: 1,
+        const packageJson = JSON.parse(await readFile(packageFile));
+
+        const packageName = "swagger2apis";
+        // 确定版本号
+        let version = "1.1.19";
+        try {
+          version = await window.getNpmPackageVersion(packageName);
+        } catch {
+          version =
+            prompt(
+              `获取包版本失败,请手动获取最新版本号 https://www.npmjs.com/package/${packageName} ,如果不进行填写,则默认使用${version}版本`
+            ) || version;
         }
-      ))
-        ? "pnpm"
-        : (await deepDirectoryFind(
+
+        // 添加npm脚本
+        const npmScriptName = "givemeApi";
+        const packageManager = (await deepDirectoryFind(
           fileHandle,
           (entry) => {
-            return entry[0] === "yarn.lock";
+            return entry[0] === "pnpm-lock.yaml";
           },
           {
             type: "file",
             depth: 1,
           }
         ))
+          ? "pnpm"
+          : (await deepDirectoryFind(
+              fileHandle,
+              (entry) => {
+                return entry[0] === "yarn.lock";
+              },
+              {
+                type: "file",
+                depth: 1,
+              }
+            ))
           ? "yarn"
           : "npm";
 
-      const preInstallString =
-        packageManager === "npm" ? "npm i" : packageManager + " add";
-      packageJson.scripts = {
-        ...packageJson.scripts,
-        [npmScriptName]: `${preInstallString} && node ./src/api/genApis.mjs && prettier --write ./src/api/*`,
+        const preInstallString =
+          packageManager === "npm" ? "npm i" : packageManager + " add";
+        packageJson.scripts = {
+          ...packageJson.scripts,
+          [npmScriptName]: `${preInstallString} && node ./src/api/genApis.mjs && prettier --write ./src/api/*`,
+        };
+
+        // 添加依赖
+        packageJson.devDependencies = {
+          ...packageJson.devDependencies,
+          [packageName]: "^" + version,
+        };
+
+        const writable2 = await packageJsonHandle.createWritable();
+        await writable2.write(JSON.stringify(packageJson, null, 2));
+        await writable2.close();
+
+        document.body.innerHTML = `<div class="alert alert-success" role="alert">
+          生成完毕,请在项目根目录下执行${packageManager} ${
+          packageManager === "yarn" ? "" : "run"
+        } ${npmScriptName}
+        </div>`;
       };
-
-      // 添加依赖
-      packageJson.devDependencies = {
-        ...packageJson.devDependencies,
-        [packageName]: "^" + version,
-      };
-
-      const writable2 = await packageJsonHandle.createWritable();
-      await writable2.write(JSON.stringify(packageJson, null, 2));
-      await writable2.close();
-
-      document.querySelector("#app").innerHTML = `生成完毕,请在项目根目录下执行${packageManager} ${packageManager === 'yarn' ? '' : 'run'} ${npmScriptName}`;
-
-    };
-    document.querySelector("button").addEventListener("click", openFile);
-  </script>
-</body>
-
+      document
+        .querySelector('button[type="submit"]')
+        .addEventListener("click", openFile);
+    </script>
+  </body>
 </html>
