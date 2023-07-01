@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文字流光效果(canvas版本)</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: pink;
+      }
+
+      canvas {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 
+        核心思想
+            页面存在两个canvas,一个作为背景板,一个作为我们操作的canvas
+            背景板和前置面板大小相同,只是颜色不同
+            通过globalCompositeOperation = "destination-out"来动态控制前置面板透明的区域
+            周期的重复上一步操作就可以实现
+     -->
+    <!-- 作为背景板 -->
+    <canvas id="bgcanvas"></canvas>
+    <!-- 作为前置面板 -->
+    <canvas id="mycanvas"></canvas>
+    <script>
+      // 屏幕中心点,后续要使用
+      const centerPoint = {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+      };
+      const words = "我想邀请你坐上我的野摩托"; // 文字内容
+      const fontSize = 100; //文字大小
+
+      /** @type {HTMLCanvasElement} */
+      const bgcanvas = document.getElementById("bgcanvas");
+      /** @type {HTMLCanvasElement} */
+      const canvas = document.getElementById("mycanvas");
+
+      function drawBg() {
+        //绘制背景文字
+        bgcanvas.width = window.innerWidth;
+        bgcanvas.height = window.innerHeight;
+        const bgctx = bgcanvas.getContext("2d");
+        bgctx.save();
+        bgctx.translate(centerPoint.x, centerPoint.y);
+        bgctx.font = "bold " + fontSize + "px Arial";
+        bgctx.textAlign = "center";
+        bgctx.textBaseline = "middle";
+        bgctx.fillStyle = "#fff";
+        bgctx.fillText(words, 0, 0);
+        bgctx.restore();
+      }
+      drawBg(); //只需要绘制一次,所以我们不需要放进requestAnimationFrame绘制
+
+      let clearId = null;
+      function drawFront() {
+        //绘制前置文字+透明区域
+        clearId && cancelAnimationFrame(clearId);
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext("2d");
+        let index = 0; //每次计算位置的根据
+        (function draw() {
+          ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+          // 绘制前置文字和背景文字除了颜色,其余保持一致
+          ctx.save();
+          ctx.translate(centerPoint.x, centerPoint.y);
+          ctx.font = "bold " + fontSize + "px Arial";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = "darkblue";
+          ctx.fillText(words, 0, 0);
+          ctx.restore();
+
+          // 透明区域的大小
+          const rectProp = {
+            width: 100,
+            height: 400,
+          };
+
+          // 绘制透明区域,这里的难点是计算位置,考虑的因素还算多
+          ctx.save();
+          ctx.translate(
+            centerPoint.x -
+              rectProp.width / 2 -
+              (words.length / 2) * fontSize +
+              index,
+            centerPoint.y - rectProp.height / 2
+          );
+          ctx.rotate((45 * Math.PI) / 180);
+          index += 5; //每次步进的量,越小动画越细腻
+          // 这个属性是关键
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.fillRect(0, 0, rectProp.width, rectProp.height);
+          ctx.restore();
+
+          // 如果达到边界,那么需要重置index的值
+          if (index > words.length * (fontSize + 20) + rectProp.width * 2) {
+            index = 0;
+          }
+          clearId = requestAnimationFrame(draw);
+        })();
+      }
+      drawFront();
+
+      // 当窗口变化的时候重新执行
+      window.onresize = () => {
+        console.log("窗口发生变化");
+
+        drawBg();
+        drawFront();
+
+        // 更新中心点
+        centerPoint.x = window.innerWidth / 2;
+        centerPoint.y = window.innerHeight / 2;
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+<!-- 
+  实现打字效果,这是在工作中需要的一个需求
+    需求列表:
+      1.实现基本的打字效果
+      2.文字的移入和移除
+      3.丝滑的文字切换
+    其实这个效果的话,首先想到的是用js来做,核心思想:裁剪字符串,在合适的时机切换文字重新执行逻辑
+    但是我们这里配合css动画来实现,利用css来帮我们完成部分工作,并且css动画不会阻塞js的主线程
+    做成通用的插件
+-->
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>打字机走起</title>
+    <script src="./typing.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-size: 3vw;
+        background-color: #000;
+        color: #fff;
+      }
+      .text {
+        color: aqua;
+        margin-bottom: 20px;
+      }
+
+      .text2 {
+        color: red;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="text2">这波啊 这波是肉蛋冲击</div>
+    <div class="text3">这波啊 这波是肉蛋冲击</div>
+
+    <script>
+      $typing({
+        selector: ".text2",
+        words: ["摩托撒手", "肉蛋冲击", "我一并超"],
+      });
+
+      $typing({
+        selector: ".text3",
+        words: ["海底捞啊海底捞啊", "螺蛳粉啊螺蛳粉啊", "无形之刃无形之刃"],
+      });
+    </script>
+  </body>
+</html>

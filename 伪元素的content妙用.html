@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: Helvetica, sans-serif;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        background-color: #000;
+        color: #fff;
+      }
+      .box {
+        width: 50%;
+        display: flex;
+        align-items: center;
+        font-size: 25px;
+        /* counter-reset: index 5; */
+        /* counter-increment: index -1; */
+        counter-increment: index;
+      }
+      .box::before {
+        content: counter(index);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 50px;
+        background-color: rgb(255, 166, 0);
+        margin-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">只因你太美</div>
+    <div class="box">只因你太太美</div>
+    <div class="box">只因你太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+    <div class="box">只因你太太太太美</div>
+  </body>
+</html>

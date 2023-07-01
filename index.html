@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      #app {
+        counter-reset: index 0;
+        animation: add 1s steps(59) 0s infinite;
+      }
+      @keyframes add {
+        to {
+          counter-increment: index 59;
+        }
+      }
+      #app::after {
+        display: block;
+        content: counter(index);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app"></div>
+  </body>
+</html>

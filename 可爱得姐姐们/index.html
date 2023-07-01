@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>壁纸一枚</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body,
+      #app {
+        height: 100%;
+      }
+
+      #app {
+        width: 100vw;
+        overflow-x: scroll;
+      }
+      #app::-webkit-scrollbar {
+        display: none;
+      }
+      img {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <img src="./bizhi.jpg" alt="" />
+    </div>
+
+    <script>
+      window.onload = function () {
+        const app = document.querySelector("#app");
+        const maxScrollWidth = app.scrollWidth;
+        const clientWidth = app.clientWidth;
+
+        const centerScroll = (maxScrollWidth - clientWidth) / 2;
+
+        const leftSpace = { min: 0, max: centerScroll };
+        const rightSpace = {
+          min: leftSpace.max,
+          max: maxScrollWidth - clientWidth,
+        };
+
+        app.scrollLeft = centerScroll;
+
+        app.addEventListener("mousemove", (e) => {
+          let leftScroll = 0;
+
+          const centerX = clientWidth / 2;
+
+          let x = e.clientX;
+          let num = 0;
+          if (x > centerX) {
+            num = (x - centerX) / centerX;
+            leftScroll =
+              num * (rightSpace.max - rightSpace.min) + rightSpace.min;
+            console.log(leftScroll);
+          } else {
+            num = x / centerX;
+            leftScroll = num * (leftSpace.max - leftSpace.min) + leftSpace.min;
+          }
+          app.scrollLeft = leftScroll;
+        });
+
+        app.addEventListener("mouseout", (e) => {
+          app.scrollLeft = centerScroll;
+        });
+      };
+    </script>
+  </body>
+</html>

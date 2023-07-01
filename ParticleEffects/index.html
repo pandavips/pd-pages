@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>粒子特效</title>
+    <script src="./js/utils.js"></script>
+    <script src="./js/Vortex.js"></script>
+    <script src="./js/Dot.js"></script>
+    <script src="./js/Canvas2Dot.js"></script>
+    <script src="./js/PanDa.js"></script>
+    <script defer src="./js/index.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background-color: #000;
+      }
+
+      canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      #alien {
+        position: fixed;
+        width: 30%;
+        height: 30px;
+        font-size: 20px;
+        left: 50%;
+        bottom: 5%;
+        transform: translateX(-50%);
+        background-color: transparent;
+        border: none;
+        outline: none;
+        border-bottom: 2px solid #fff;
+        color: #fff;
+        text-align: center;
+      }
+
+      #alien::placeholder {
+        color: rgb(177, 174, 174);
+        font-size: 12px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="canvas">宁不配拥有canvas.</canvas>
+    <!-- <input
+      id="alien"
+      type="text"
+      maxlength="30"
+      placeholder="这里可以传递消息给这个次元 支持一些简单的指令:#stop #start"
+    /> -->
+  </body>
+</html>
